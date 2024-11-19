@@ -6,13 +6,18 @@
  * Author: Nicolas Dominguez
  */
 
+// Define the allowed role
+// EDIT THIS SECTION WHEN VALUES BECOME KNOWN
+const CUSTOM_MENU_ALLOWED_ROLE = 'editor';
+const CUSTOM_MENU_CAPABILITY = 'edit_posts';
+
 // Define the menu structure
 // EDIT THIS SECTION WHEN VALUES BECOME KNOWN
 const CUSTOM_MENU_STRUCTURE = [
     'main' => [
         'page_title'  => 'Main Menu Title',
         'menu_title'  => 'Main Menu',
-        'capability'  => 'manage_options',
+        'capability'  => CUSTOM_MENU_CAPABILITY,
         'menu_slug'   => 'custom-main-menu',
         'callback'    => 'custom_main_menu_page',
         'icon'        => 'dashicons-admin-generic',
@@ -22,14 +27,14 @@ const CUSTOM_MENU_STRUCTURE = [
         [
             'page_title' => 'Child Page 1',
             'menu_title' => 'Child Menu 1',
-            'capability' => 'manage_options',
+            'capability' => CUSTOM_MENU_CAPABILITY,
             'menu_slug'  => 'custom-child-menu-1',
             'callback'   => 'custom_child_menu_page_1',
         ],
         [
             'page_title' => 'Child Page 2',
             'menu_title' => 'Child Menu 2',
-            'capability' => 'manage_options',
+            'capability' => CUSTOM_MENU_CAPABILITY,
             'menu_slug'  => 'custom-child-menu-2',
             'callback'   => 'custom_child_menu_page_2',
         ],
@@ -40,6 +45,12 @@ const CUSTOM_MENU_STRUCTURE = [
 add_action('admin_menu', 'custom_menu_plugin_register');
 
 function custom_menu_plugin_register() {
+    
+    // Check if the current user has the requierd role
+    if (!custom_user_has_role(CUSTOM_MENU_ALLOWED_ROLE)) {
+        return;
+    }
+
     // Register main menu
     $main_menu = CUSTOM_MENU_STRUCTURE['main'];
     add_menu_page(
@@ -55,7 +66,7 @@ function custom_menu_plugin_register() {
     // Register child menus
     foreach (CUSTOM_MENU_STRUCTURE['children'] as $child) {
         add_submenu_page(
-            $main_menu['menu_slug'], // Parent slug
+            $main_menu['menu_slug'],
             $child['page_title'],
             $child['menu_title'],
             $child['capability'],
@@ -63,6 +74,12 @@ function custom_menu_plugin_register() {
             $child['callback']
         );
     }
+}
+
+// Function to check if a user has the role
+function custom_user_has_role($role) {
+    $user = wp_get_current_user();
+    return in_array($role, (array) $user->roles);
 }
 
 // Callback function for main menu page
