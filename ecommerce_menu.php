@@ -1,101 +1,249 @@
 <?php
 /**
  * Plugin Name: iBee Ecommerce Menu
- * Description: Adds a custom admin menu with configurable options.
+ * Description: Replaces the default admin menu for iBee structure.
  * Version: 1.0
  * Author: Nicolas Dominguez
  */
 
-// Define the allowed role
-// EDIT THIS SECTION WHEN VALUES BECOME KNOWN
-const CUSTOM_MENU_ALLOWED_ROLE = 'editor';
-const CUSTOM_MENU_CAPABILITY = 'edit_posts';
+add_action('admin_menu', 'custom_editor_menu', 999);
 
-// Define the menu structure
-// EDIT THIS SECTION WHEN VALUES BECOME KNOWN
-const CUSTOM_MENU_STRUCTURE = [
-    'main' => [
-        'page_title'  => 'Main Menu Title',
-        'menu_title'  => 'Main Menu',
-        'capability'  => CUSTOM_MENU_CAPABILITY,
-        'menu_slug'   => 'custom-main-menu',
-        'callback'    => 'custom_main_menu_page',
-        'icon'        => 'dashicons-admin-generic',
-        'position'    => 2,
-    ],
-    'children' => [
-        [
-            'page_title' => 'Child Page 1',
-            'menu_title' => 'Child Menu 1',
-            'capability' => CUSTOM_MENU_CAPABILITY,
-            'menu_slug'  => 'custom-child-menu-1',
-            'callback'   => 'custom_child_menu_page_1',
-        ],
-        [
-            'page_title' => 'Child Page 2',
-            'menu_title' => 'Child Menu 2',
-            'capability' => CUSTOM_MENU_CAPABILITY,
-            'menu_slug'  => 'custom-child-menu-2',
-            'callback'   => 'custom_child_menu_page_2',
-        ],
-    ],
-];
-
-// Hook to admin_menu to register menu items
-add_action('admin_menu', 'custom_menu_plugin_register');
-
-function custom_menu_plugin_register() {
-    
-    // Check if the current user has the requierd role
-    if (!custom_user_has_role(CUSTOM_MENU_ALLOWED_ROLE)) {
+function custom_editor_menu() {
+    // Check if the current user has the 'editor' role
+    if (!current_user_can('editor')) {
         return;
     }
 
-    // Register main menu
-    $main_menu = CUSTOM_MENU_STRUCTURE['main'];
+    // Remove all existing menu items
+    global $menu, $submenu;
+    $menu = [];
+    $submenu = [];
+
+    // Define plugin directory for SVGs
+    $icon_base_url = plugin_dir_url(__FILE__) . 'icons/';
+
+    // Inicio
     add_menu_page(
-        $main_menu['page_title'],
-        $main_menu['menu_title'],
-        $main_menu['capability'],
-        $main_menu['menu_slug'],
-        $main_menu['callback'],
-        $main_menu['icon'],
-        $main_menu['position']
+        __('Inicio', 'custom-editor-menu'), // Page title
+        __('Inicio', 'custom-editor-menu'), // Menu title
+        'read', // Capability
+        'inicio', // Slug
+        function() { wp_redirect('/backoffice/admin.php?page=wc-admin&path=/analytics/overview'); exit; }, // Redirect
+        $icon_base_url . 'inicio.svg', // Icon
+        1 // Position
     );
 
-    // Register child menus
-    foreach (CUSTOM_MENU_STRUCTURE['children'] as $child) {
+    // Pedidos
+    add_menu_page(
+        __('Pedidos', 'custom-editor-menu'), // Page title
+        __('Pedidos', 'custom-editor-menu'), // Menu title
+        'read', // Capability
+        'pedidos', // Slug
+        function() { wp_redirect('/backoffice/admin.php?page=wc-orders'); exit; }, // Redirect
+        $icon_base_url . 'pedidos.svg', // Icon
+        2 // Position
+    );
+
+    // Clientes
+    add_menu_page(
+        __('Clientes', 'custom-editor-menu'), // Page title
+        __('Clientes', 'custom-editor-menu'), // Menu title
+        'read', // Capability
+        'clientes', // Slug
+        function() { wp_redirect('/backoffice/admin.php?page=wc-admin&path=/customers'); exit; }, // Redirect
+        $icon_base_url . 'clientes.svg', // Icon
+        3 // Position
+    );
+
+    // Productos
+    add_menu_page(
+        __('Productos', 'custom-editor-menu'), // Page title
+        __('Productos', 'custom-editor-menu'), // Menu title
+        'read', // Capability
+        'productos', // Slug
+        function() { wp_redirect('/backoffice/edit.php?post_type=product'); exit; }, // Redirect
+        $icon_base_url . 'productos.svg', // Icon
+        4 // Position
+    );
+
+        // Todos los productos
         add_submenu_page(
-            $main_menu['menu_slug'],
-            $child['page_title'],
-            $child['menu_title'],
-            $child['capability'],
-            $child['menu_slug'],
-            $child['callback']
+            'productos', // Parent slug
+            __('Todos los productos', 'custom-editor-menu'), // Page title
+            __('Todos los productos', 'custom-editor-menu'), // Menu title
+            'read', // Capability
+            'productos-todos-los-productos', // Slug
+            function() { wp_redirect('/backoffice/edit.php?post_type=product'); exit; } // Redirect
         );
-    }
-}
 
-// Function to check if a user has the role
-function custom_user_has_role($role) {
-    $user = wp_get_current_user();
-    return in_array($role, (array) $user->roles);
-}
+        // Añadir nuevo producto
+        add_submenu_page(
+            'productos', // Parent slug
+            __('Añadir nuevo producto', 'custom-editor-menu'), // Page title
+            __('Añadir nuevo producto', 'custom-editor-menu'), // Menu title
+            'read', // Capability
+            'productos-anadir-nuevo-producto', // Slug
+            function() { wp_redirect('/backoffice/post-new.php?post_type=product'); exit; } // Redirect
+        );
 
-// Callback function for main menu page
-function custom_main_menu_page() {
-    echo '<h1>Main Menu Page</h1>';
-    echo '<p>EDIT THIS CONTENT FROM wp_ecommerce_menu PLUGIN FILES</p>';
-}
+        // Categorías
+        add_submenu_page(
+            'productos', // Parent slug
+            __('Categorías', 'custom-editor-menu'), // Page title
+            __('Categorías', 'custom-editor-menu'), // Menu title
+            'read', // Capability
+            'productos-categorias', // Slug
+            function() { wp_redirect('/backoffice/edit-tags.php?taxonomy=product_cat&post_type=product'); exit; } // Redirect
+        );
 
-// Callback function for child menu 1
-function custom_child_menu_page_1() {
-    echo '<h1>Child Menu 1 Page</h1>';
-    echo '<p>EDIT THIS CONTENT FROM wp_ecommerce_menu PLUGIN FILES</p>';
-}
+        // Etiquetas
+        add_submenu_page(
+            'productos', // Parent slug
+            __('Etiquetas', 'custom-editor-menu'), // Page title
+            __('Etiquetas', 'custom-editor-menu'), // Menu title
+            'read', // Capability
+            'productos-etiquetas', // Slug
+            function() { wp_redirect('/backoffice/edit-tags.php?taxonomy=product_tag&post_type=product'); exit; } // Redirect
+        );
 
-// Callback function for child menu 2
-function custom_child_menu_page_2() {
-    echo '<h1>Child Menu 2 Page</h1>';
-    echo '<p>EDIT THIS CONTENT FROM wp_ecommerce_menu PLUGIN FILES</p>';
+        // Atributos
+        add_submenu_page(
+            'productos', // Parent slug
+            __('Atributos', 'custom-editor-menu'), // Page title
+            __('Atributos', 'custom-editor-menu'), // Menu title
+            'read', // Capability
+            'productos-atributos', // Slug
+            function() { wp_redirect('/backoffice/edit.php?post_type=product&page=product_attributes'); exit; } // Redirect
+        );
+
+        // Valoraciones
+        add_submenu_page(
+            'productos', // Parent slug
+            __('Valoraciones', 'custom-editor-menu'), // Page title
+            __('Valoraciones', 'custom-editor-menu'), // Menu title
+            'read', // Capability
+            'productos-valoraciones', // Slug
+            function() { wp_redirect('/backoffice/edit.php?post_type=product&page=product-reviews'); exit; } // Redirect
+        );
+    
+    // Estadísticas
+    add_menu_page(
+        __('Estadísticas', 'custom-editor-menu'), // Page title
+        __('Estadísticas', 'custom-editor-menu'), // Menu title
+        'read', // Capability
+        'estadisticas', // Slug
+        function() { wp_redirect('/backoffice/admin.php?page=wc-admin&path=/analytics/overview'); exit; }, // Redirect
+        $icon_base_url . 'estadisticas.svg', // Icon
+        5 // Position
+    );
+
+        // General
+        add_submenu_page(
+            'estadisticas', // Parent slug
+            __('General', 'custom-editor-menu'), // Page title
+            __('General', 'custom-editor-menu'), // Menu title
+            'read', // Capability
+            'estadisticas-general', // Slug
+            function() { wp_redirect('/backoffice/admin.php?page=wc-admin&path=/analytics/overview'); exit; } // Redirect
+        );
+
+        // Productos
+        add_submenu_page(
+            'estadisticas', // Parent slug
+            __('Productos', 'custom-editor-menu'), // Page title
+            __('Productos', 'custom-editor-menu'), // Menu title
+            'read', // Capability
+            'estadisticas-productos', // Slug
+            function() { wp_redirect('/backoffice/admin.php?page=wc-admin&path=/analytics/products'); exit; } // Redirect
+        );
+
+        // Rentabilidad
+        add_submenu_page(
+            'estadisticas', // Parent slug
+            __('Rentabilidad', 'custom-editor-menu'), // Page title
+            __('Rentabilidad', 'custom-editor-menu'), // Menu title
+            'read', // Capability
+            'estadisticas-rentabilidad', // Slug
+            function() { wp_redirect('/backoffice/admin.php?page=wc-admin&path=/analytics/revenue'); exit; } // Redirect
+        );
+
+        // Pedidos
+        add_submenu_page(
+            'estadisticas', // Parent slug
+            __('Pedidos', 'custom-editor-menu'), // Page title
+            __('Pedidos', 'custom-editor-menu'), // Menu title
+            'read', // Capability
+            'estadisticas-pedidos', // Slug
+            function() { wp_redirect('/backoffice/admin.php?page=wc-admin&path=/analytics/orders'); exit; } // Redirect
+        );
+
+        // Variaciones
+        add_submenu_page(
+            'estadisticas', // Parent slug
+            __('Variaciones', 'custom-editor-menu'), // Page title
+            __('Variaciones', 'custom-editor-menu'), // Menu title
+            'read', // Capability
+            'estadisticas-variaciones', // Slug
+            function() { wp_redirect('/backoffice/admin.php?page=wc-admin&path=/analytics/variations'); exit; } // Redirect
+        );
+
+        // Categorías
+        add_submenu_page(
+            'estadisticas', // Parent slug
+            __('Categorías', 'custom-editor-menu'), // Page title
+            __('Categorías', 'custom-editor-menu'), // Menu title
+            'read', // Capability
+            'estadisticas-categorias', // Slug
+            function() { wp_redirect('/backoffice/admin.php?page=wc-admin&path=/analytics/categories'); exit; } // Redirect
+        );
+
+        // Cupones
+        add_submenu_page(
+            'estadisticas', // Parent slug
+            __('Cupones', 'custom-editor-menu'), // Page title
+            __('Cupones', 'custom-editor-menu'), // Menu title
+            'read', // Capability
+            'estadisticas-cupones', // Slug
+            function() { wp_redirect('/backoffice/admin.php?page=wc-admin&path=/analytics/coupons'); exit; } // Redirect
+        );
+
+        // Impuestos
+        add_submenu_page(
+            'estadisticas', // Parent slug
+            __('Impuestos', 'custom-editor-menu'), // Page title
+            __('Impuestos', 'custom-editor-menu'), // Menu title
+            'read', // Capability
+            'estadisticas-impuestos', // Slug
+            function() { wp_redirect('/backoffice/admin.php?page=wc-admin&path=/analytics/taxes'); exit; } // Redirect
+        );
+
+        // Descargas
+        add_submenu_page(
+            'estadisticas', // Parent slug
+            __('Descargas', 'custom-editor-menu'), // Page title
+            __('Descargas', 'custom-editor-menu'), // Menu title
+            'read', // Capability
+            'estadisticas-descargas', // Slug
+            function() { wp_redirect('/backoffice/admin.php?page=wc-admin&path=/analytics/downloads'); exit; } // Redirect
+        );
+
+        // Stock
+        add_submenu_page(
+            'estadisticas', // Parent slug
+            __('Stock', 'custom-editor-menu'), // Page title
+            __('Stock', 'custom-editor-menu'), // Menu title
+            'read', // Capability
+            'estadisticas-stock', // Slug
+            function() { wp_redirect('/backoffice/admin.php?page=wc-admin&path=/analytics/stock'); exit; } // Redirect
+        );
+
+        // Ajustes
+        add_submenu_page(
+            'estadisticas', // Parent slug
+            __('Ajustes', 'custom-editor-menu'), // Page title
+            __('Ajustes', 'custom-editor-menu'), // Menu title
+            'read', // Capability
+            'estadisticas-ajustes', // Slug
+            function() { wp_redirect('/backoffice/admin.php?page=wc-admin&path=/analytics/settings'); exit; } // Redirect
+        );
 }
