@@ -392,4 +392,243 @@ function custom_editor_menu() {
         $icon_base_url . 'mailchimp.svg', // Icon
         11 // Position
     );
+
+    // Mercado Pago
+    add_menu_page(
+        __('Mercado Pago', 'custom-editor-menu'), // Page title
+        __('Mercado Pago', 'custom-editor-menu'), // Menu title
+        'read', // Capability
+        'mercado-pago', // Slug
+        function() { wp_redirect('/backoffice/admin.php?page=mercadopago-settings'); exit; }, // Redirect
+        $icon_base_url . 'mercado-pago.svg', // Icon
+        12 // Position
+    );
+
+    // Payway
+    add_menu_page(
+        __('Payway', 'custom-editor-menu'), // Page title
+        __('Payway', 'custom-editor-menu'), // Menu title
+        'read', // Capability
+        'payway', // Slug
+        function() { wp_redirect('/backoffice/admin.php?page=payway_admin_promotions'); exit; }, // Redirect
+        $icon_base_url . 'payway.svg', // Icon
+        13 // Position
+    );
+
+        // Promociones
+        add_submenu_page(
+            'payway', // Parent slug
+            __('Promociones', 'custom-editor-menu'), // Page title
+            __('Promociones', 'custom-editor-menu'), // Menu title
+            'read', // Capability
+            'payway-promociones', // Slug
+            function() { wp_redirect('/backoffice/admin.php?page=payway_admin_promotions'); exit; } // Redirect
+        );
+
+        // Bancos
+        add_submenu_page(
+            'payway', // Parent slug
+            __('Bancos', 'custom-editor-menu'), // Page title
+            __('Bancos', 'custom-editor-menu'), // Menu title
+            'read', // Capability
+            'payway-bancos', // Slug
+            function() { wp_redirect('/backoffice/admin.php?page=payway_admin_banks'); exit; } // Redirect
+        );
+
+        // Tarjetas
+        add_submenu_page(
+            'payway', // Parent slug
+            __('Tarjetas', 'custom-editor-menu'), // Page title
+            __('Tarjetas', 'custom-editor-menu'), // Menu title
+            'read', // Capability
+            'payway-tarjetas', // Slug
+            function() { wp_redirect('/backoffice/admin.php?page=payway_admin_cards'); exit; } // Redirect
+        );
+
+        // Ajustes
+        add_submenu_page(
+            'payway', // Parent slug
+            __('Ajustes', 'custom-editor-menu'), // Page title
+            __('Ajustes', 'custom-editor-menu'), // Menu title
+            'read', // Capability
+            'payway-ajustes', // Slug
+            function() { wp_redirect('/backoffice/admin.php?page=wc-settings&tab=checkout&section=payway_gateway'); exit; } // Redirect
+        );
+
+    // Transferencia Bancaria
+    add_menu_page(
+        __('Transferencia Bancaria', 'custom-editor-menu'), // Page title
+        __('Transferencia Bancaria', 'custom-editor-menu'), // Menu title
+        'read', // Capability
+        'payway', // Slug
+        function() { wp_redirect('/backoffice/admin.php?page=wc-settings&tab=checkout&section=bacs'); exit; }, // Redirect
+        $icon_base_url . 'transferencia-bancaria.svg', // Icon
+        14 // Position
+    );
+
+    // Correo Argentino
+    add_menu_page(
+        __('Correo Argentino', 'custom-editor-menu'), // Page title
+        __('Correo Argentino', 'custom-editor-menu'), // Menu title
+        'read', // Capability
+        'correo-argentino', // Slug
+        function() { wp_redirect('/backoffice/admin.php?page=correoargentino-orders'); exit; }, // Redirect
+        $icon_base_url . 'correo-argentino.svg', // Icon
+        15 // Position
+    );
+
+        // Órdenes
+        add_submenu_page(
+            'correo-argentino', // Parent slug
+            __('Órdenes', 'custom-editor-menu'), // Page title
+            __('Órdenes', 'custom-editor-menu'), // Menu title
+            'read', // Capability
+            'correo-argentino-ordenes', // Slug
+            function() { wp_redirect('/backoffice/admin.php?page=correoargentino-orders'); exit; } // Redirect
+        );
+
+        // Conexión API
+        add_submenu_page(
+            'correo-argentino', // Parent slug
+            __('Conexión API', 'custom-editor-menu'), // Page title
+            __('Conexión API', 'custom-editor-menu'), // Menu title
+            'read', // Capability
+            'correo-argentino-conexion-api', // Slug
+            function() { wp_redirect('/backoffice/admin.php?page=wc-settings&tab=shipping&section=correoargentino_shipping_method&form=service-selector'); exit; } // Redirect
+        );
+
+    // Páginas
+    add_menu_page(
+        __('Páginas', 'custom-editor-menu'), // Page title
+        __('Páginas', 'custom-editor-menu'), // Menu title
+        'read', // Capability
+        'paginas', // Slug
+        function() { wp_redirect('/backoffice/edit.php?post_type=page'); exit; }, // Redirect
+        $icon_base_url . 'paginas.svg', // Icon
+        16 // Position
+    );
+
+        // Todas las páginas
+        add_submenu_page(
+            'paginas', // Parent slug
+            __('Todas las páginas', 'custom-editor-menu'), // Page title
+            __('Todas las páginas', 'custom-editor-menu'), // Menu title
+            'read', // Capability
+            'paginas-todas-las-paginas', // Slug
+            function() { wp_redirect('/backoffice/edit.php?post_type=page'); exit; } // Redirect
+        );
+
+        // Añadir nueva página
+        add_submenu_page(
+            'paginas', // Parent slug
+            __('Añadir nueva página', 'custom-editor-menu'), // Page title
+            __('Añadir nueva página', 'custom-editor-menu'), // Menu title
+            'read', // Capability
+            'paginas-anadir-nueva-pagina', // Slug
+            function() { wp_redirect('/backoffice/post-new.php?post_type=page'); exit; } // Redirect
+        );
+
+    // Medios
+    add_menu_page(
+        __('Medios', 'custom-editor-menu'), // Page title
+        __('Medios', 'custom-editor-menu'), // Menu title
+        'read', // Capability
+        'medios', // Slug
+        function() { wp_redirect('/backoffice/upload.php'); exit; }, // Redirect
+        $icon_base_url . 'medios.svg', // Icon
+        17 // Position
+    );
+
+        // Biblioteca
+        add_submenu_page(
+            'medios', // Parent slug
+            __('Biblioteca', 'custom-editor-menu'), // Page title
+            __('Biblioteca', 'custom-editor-menu'), // Menu title
+            'read', // Capability
+            'medios-biblioteca', // Slug
+            function() { wp_redirect('/backoffice/upload.php'); exit; } // Redirect
+        );
+
+        // Añadir nuevo archivo de medios
+        add_submenu_page(
+            'medios', // Parent slug
+            __('Añadir nuevo archivo de medios', 'custom-editor-menu'), // Page title
+            __('Añadir nuevo archivo de medios', 'custom-editor-menu'), // Menu title
+            'read', // Capability
+            'medios-anadir-nuevo-archivo-de-medios', // Slug
+            function() { wp_redirect('/backoffice/media-new.php'); exit; } // Redirect
+        );
+
+    // Apariencia
+    add_menu_page(
+        __('Apariencia', 'custom-editor-menu'), // Page title
+        __('Apariencia', 'custom-editor-menu'), // Menu title
+        'read', // Capability
+        'apariencia', // Slug
+        function() { wp_redirect('/backoffice/nav-menus.php'); exit; }, // Redirect
+        $icon_base_url . 'apariencia.svg', // Icon
+        18 // Position
+    );
+
+        // Menús
+        add_submenu_page(
+            'apariencia', // Parent slug
+            __('Menús', 'custom-editor-menu'), // Page title
+            __('Menús', 'custom-editor-menu'), // Menu title
+            'read', // Capability
+            'apariencia-menus', // Slug
+            function() { wp_redirect('/backoffice/nav-menus.php'); exit; } // Redirect
+        );
+
+        // Favicon
+        add_submenu_page(
+            'apariencia', // Parent slug
+            __('Favicon', 'custom-editor-menu'), // Page title
+            __('Favicon', 'custom-editor-menu'), // Menu title
+            'read', // Capability
+            'apariencia-favicon', // Slug
+            function() { wp_redirect('/backoffice/themes.php?page=favicon-by-realfavicongenerator/admin/class-favicon-by-realfavicongenerator-admin.phpfavicon_appearance_menu'); exit; } // Redirect
+        );
+
+    // Usuarios
+    add_menu_page(
+        __('Usuarios', 'custom-editor-menu'), // Page title
+        __('Usuarios', 'custom-editor-menu'), // Menu title
+        'read', // Capability
+        'usuarios', // Slug
+        function() { wp_redirect('/backoffice/profile.php'); exit; }, // Redirect
+        $icon_base_url . 'profile.svg', // Icon
+        19 // Position
+    );
+
+    // Herramientas
+    add_menu_page(
+        __('Herramientas', 'custom-editor-menu'), // Page title
+        __('Herramientas', 'custom-editor-menu'), // Menu title
+        'read', // Capability
+        'herramientas', // Slug
+        function() { wp_redirect('/backoffice/import.php'); exit; }, // Redirect
+        $icon_base_url . 'herramientas.svg', // Icon
+        20 // Position
+    );
+
+        // Importar
+        add_submenu_page(
+            'heramientas', // Parent slug
+            __('Importar', 'custom-editor-menu'), // Page title
+            __('Importar', 'custom-editor-menu'), // Menu title
+            'read', // Capability
+            'herramientas-importar', // Slug
+            function() { wp_redirect('/backoffice/import.php'); exit; } // Redirect
+        );
+
+        // Exportar
+        add_submenu_page(
+            'heramientas', // Parent slug
+            __('Exportar', 'custom-editor-menu'), // Page title
+            __('Exportar', 'custom-editor-menu'), // Menu title
+            'read', // Capability
+            'herramientas-exportar', // Slug
+            function() { wp_redirect('/backoffice/export.php'); exit; } // Redirect
+        );
 }
