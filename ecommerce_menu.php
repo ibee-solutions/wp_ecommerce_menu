@@ -95,6 +95,16 @@ function custom_editor_menu() {
             'productos-categorias', // Slug
             function() { wp_redirect('/backoffice/edit-tags.php?taxonomy=product_cat&post_type=product'); exit; } // Redirect
         );
+        
+        // Marcas
+        add_submenu_page(
+            'productos', // Parent slug
+            __('Marcas', 'custom-editor-menu'), // Page title
+            __('Marcas', 'custom-editor-menu'), // Menu title
+            'read', // Capability
+            'productos-marcas', // Slug
+            function() { wp_redirect('/backoffice/edit-tags.php?taxonomy=berocket_brand&post_type=product'); exit; } // Redirect
+        );
 
         // Etiquetas
         add_submenu_page(
