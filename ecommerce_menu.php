@@ -460,7 +460,7 @@ function custom_editor_menu() {
         __('Transferencia Bancaria', 'custom-editor-menu'), // Page title
         __('Transferencia Bancaria', 'custom-editor-menu'), // Menu title
         'read', // Capability
-        'payway', // Slug
+        'transferencia-bancaria', // Slug
         function() { wp_redirect('/backoffice/admin.php?page=wc-settings&tab=checkout&section=bacs'); exit; }, // Redirect
         $icon_base_url . 'transferencia-bancaria.svg', // Icon
         14 // Position
@@ -614,7 +614,7 @@ function custom_editor_menu() {
 
         // Importar
         add_submenu_page(
-            'heramientas', // Parent slug
+            'herramientas', // Parent slug
             __('Importar', 'custom-editor-menu'), // Page title
             __('Importar', 'custom-editor-menu'), // Menu title
             'read', // Capability
@@ -624,7 +624,7 @@ function custom_editor_menu() {
 
         // Exportar
         add_submenu_page(
-            'heramientas', // Parent slug
+            'herramientas', // Parent slug
             __('Exportar', 'custom-editor-menu'), // Page title
             __('Exportar', 'custom-editor-menu'), // Menu title
             'read', // Capability
