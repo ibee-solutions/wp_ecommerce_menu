@@ -597,7 +597,7 @@ function custom_editor_menu() {
         'read', // Capability
         'usuarios', // Slug
         function() { wp_redirect('/backoffice/profile.php'); exit; }, // Redirect
-        $icon_base_url . 'profile.svg', // Icon
+        $icon_base_url . 'usuarios.svg', // Icon
         19 // Position
     );
 
