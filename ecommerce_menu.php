@@ -256,4 +256,140 @@ function custom_editor_menu() {
             'estadisticas-ajustes', // Slug
             function() { wp_redirect('/backoffice/admin.php?page=wc-admin&path=/analytics/settings'); exit; } // Redirect
         );
+
+    // Descuentos
+    add_menu_page(
+        __('Descuentos', 'custom-editor-menu'), // Page title
+        __('Descuentos', 'custom-editor-menu'), // Menu title
+        'read', // Capability
+        'descuentos', // Slug
+        function() { wp_redirect('/backoffice/edit.php?post_type=shop_coupon'); exit; }, // Redirect
+        $icon_base_url . 'descuentos.svg', // Icon
+        6 // Position
+    );
+
+        // Cupones
+        add_submenu_page(
+            'descuentos', // Parent slug
+            __('Cupones', 'custom-editor-menu'), // Page title
+            __('Cupones', 'custom-editor-menu'), // Menu title
+            'read', // Capability
+            'descuentos-cupones', // Slug
+            function() { wp_redirect('/backoffice/edit.php?post_type=shop_coupon'); exit; } // Redirect
+        );
+
+    // Google
+    add_menu_page(
+        __('Google', 'custom-editor-menu'), // Page title
+        __('Google', 'custom-editor-menu'), // Menu title
+        'read', // Capability
+        'google', // Slug
+        function() { wp_redirect('/backoffice/admin.php?page=wc-admin&path=/google/start'); exit; }, // Redirect
+        $icon_base_url . 'google.svg', // Icon
+        7 // Position
+    );
+
+        // Integración
+        add_submenu_page(
+            'google', // Parent slug
+            __('Integración', 'custom-editor-menu'), // Page title
+            __('Integración', 'custom-editor-menu'), // Menu title
+            'read', // Capability
+            'google-integracion', // Slug
+            function() { wp_redirect('/backoffice/admin.php?page=wc-admin&path=/google/start'); exit; } // Redirect
+        );
+
+        // Site Kit
+        add_submenu_page(
+            'google', // Parent slug
+            __('Site Kit', 'custom-editor-menu'), // Page title
+            __('Site Kit', 'custom-editor-menu'), // Menu title
+            'read', // Capability
+            'google-site-kit', // Slug
+            function() { wp_redirect('/backoffice/admin.php?page=googlesitekit-splash'); exit; } // Redirect
+        );
+
+    // Meta
+    add_menu_page(
+        __('Meta', 'custom-editor-menu'), // Page title
+        __('Meta', 'custom-editor-menu'), // Menu title
+        'read', // Capability
+        'meta', // Slug
+        function() { wp_redirect('/backoffice/admin.php?page=wc-facebook'); exit; }, // Redirect
+        $icon_base_url . 'meta.svg', // Icon
+        8 // Position
+    );
+
+        // Facebook
+        add_submenu_page(
+            'meta', // Parent slug
+            __('Facebook', 'custom-editor-menu'), // Page title
+            __('Facebook', 'custom-editor-menu'), // Menu title
+            'read', // Capability
+            'meta-facebook', // Slug
+            function() { wp_redirect('/backoffice/admin.php?page=wc-facebook'); exit; } // Redirect
+        );
+
+        // Pixel
+        add_submenu_page(
+            'meta', // Parent slug
+            __('Pixel', 'custom-editor-menu'), // Page title
+            __('Pixel', 'custom-editor-menu'), // Menu title
+            'read', // Capability
+            'meta-pixel', // Slug
+            function() { wp_redirect('/backoffice/options-general.php?page=facebook_pixel_options'); exit; } // Redirect
+        );
+
+    // TikTok
+    add_menu_page(
+        __('TikTok', 'custom-editor-menu'), // Page title
+        __('TikTok', 'custom-editor-menu'), // Menu title
+        'read', // Capability
+        'tiktok', // Slug
+        function() { wp_redirect('/backoffice/admin.php?page=tiktok'); exit; }, // Redirect
+        $icon_base_url . 'tiktok.svg', // Icon
+        9 // Position
+    );
+
+    // WhatsApp
+    add_menu_page(
+        __('WhatsApp', 'custom-editor-menu'), // Page title
+        __('WhatsApp', 'custom-editor-menu'), // Menu title
+        'read', // Capability
+        'whatsapp', // Slug
+        function() { wp_redirect('/backoffice/admin.php?page=click-to-chat'); exit; }, // Redirect
+        $icon_base_url . 'whatsapp.svg', // Icon
+        10 // Position
+    );
+
+        // Ajustes
+        add_submenu_page(
+            'whatsapp', // Parent slug
+            __('Ajustes', 'custom-editor-menu'), // Page title
+            __('Ajustes', 'custom-editor-menu'), // Menu title
+            'read', // Capability
+            'whatsapp-ajustes', // Slug
+            function() { wp_redirect('/backoffice/admin.php?page=click-to-chat'); exit; } // Redirect
+        );
+
+        // Saludos
+        add_submenu_page(
+            'whatsapp', // Parent slug
+            __('Saludos', 'custom-editor-menu'), // Page title
+            __('Saludos', 'custom-editor-menu'), // Menu title
+            'read', // Capability
+            'whatsapp-saludos', // Slug
+            function() { wp_redirect('/backoffice/admin.php?page=click-to-chat-greetings'); exit; } // Redirect
+        );
+    
+    // Mailchimp
+    add_menu_page(
+        __('Mailchimp', 'custom-editor-menu'), // Page title
+        __('Mailchimp', 'custom-editor-menu'), // Menu title
+        'read', // Capability
+        'mailchimp', // Slug
+        function() { wp_redirect('/backoffice/admin.php?page=mailchimp-woocommerce'); exit; }, // Redirect
+        $icon_base_url . 'mailchimp.svg', // Icon
+        11 // Position
+    );
 }
