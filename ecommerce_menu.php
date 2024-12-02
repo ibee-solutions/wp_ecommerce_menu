@@ -10,7 +10,7 @@ add_action('admin_menu', 'custom_editor_menu', 999);
 
 function custom_editor_menu() {
     // Check if the current user has the 'editor' role
-    if (!current_user_can('editor')) {
+    if (!current_user_can('shop_manager')) {
         return;
     }
 
