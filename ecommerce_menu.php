@@ -2,633 +2,906 @@
 /**
  * Plugin Name: iBee Ecommerce Menu
  * Description: Replaces the default admin menu for iBee structure.
- * Version: 1.0
+ * Version: 1.0.3
  * Author: Nicolas Dominguez
  */
 
-add_action('admin_menu', 'custom_editor_menu', 999);
+add_action("admin_menu", "custom_shop_manager_menu", 999);
 
-function custom_editor_menu() {
-    // Check if the current user has the 'editor' role
-    if (!current_user_can('shop_manager')) {
-        return;
-    }
+function custom_shop_manager_menu()
+{
+    if (current_user_can("shop_manager")) {
+        global $menu;
+        foreach ($menu as $key => $value) {
+            // El índice 2 contiene el slug del menú
+            remove_menu_page($value[2]);
+        }
 
-    // Remove all existing menu items
-    global $menu, $submenu;
-    $menu = [];
-    $submenu = [];
+        // Define plugin directory for SVGs
+        $icon_base_url = plugin_dir_url(__FILE__) . "icons/";
 
-    // Define plugin directory for SVGs
-    $icon_base_url = plugin_dir_url(__FILE__) . 'icons/';
+        // --------------------------------------------------------------------------------------------------------
+        // Inicio
+        // --------------------------------------------------------------------------------------------------------
+        add_menu_page(
+            __("Inicio", "custom-editor-menu"),
+            __("Inicio", "custom-editor-menu"),
+            "read",
+            "inicio",
+            function () {
+                wp_redirect(
+                    "/backoffice/admin.php?page=wc-admin&path=/analytics/overview"
+                );
+                exit();
+            },
+            $icon_base_url . "inicio.svg",
+            1
+        );
 
-    // Inicio
-    add_menu_page(
-        __('Inicio', 'custom-editor-menu'), // Page title
-        __('Inicio', 'custom-editor-menu'), // Menu title
-        'read', // Capability
-        'inicio', // Slug
-        function() { wp_redirect('/backoffice/admin.php?page=wc-admin&path=/analytics/overview'); exit; }, // Redirect
-        $icon_base_url . 'inicio.svg', // Icon
-        1 // Position
-    );
+        // --------------------------------------------------------------------------------------------------------
+        // Pedidos
+        // --------------------------------------------------------------------------------------------------------
+        add_menu_page(
+            __("Pedidos", "custom-editor-menu"),
+            __("Pedidos", "custom-editor-menu"),
+            "edit_shop_orders",
+            "admin.php?page=wc-orders",
+            "",
+            $icon_base_url . "pedidos.svg",
+            2
+        );
 
-    // Pedidos
-    add_menu_page(
-        __('Pedidos', 'custom-editor-menu'), // Page title
-        __('Pedidos', 'custom-editor-menu'), // Menu title
-        'read', // Capability
-        'pedidos', // Slug
-        function() { wp_redirect('/backoffice/admin.php?page=wc-orders'); exit; }, // Redirect
-        $icon_base_url . 'pedidos.svg', // Icon
-        2 // Position
-    );
+        // --------------------------------------------------------------------------------------------------------
+        // Clientes
+        // --------------------------------------------------------------------------------------------------------
+        add_menu_page(
+            __("Clientes", "custom-editor-menu"),
+            __("Clientes", "custom-editor-menu"),
+            "read",
+            "clientes",
+            function () {
+                wp_redirect(
+                    "/backoffice/admin.php?page=wc-admin&path=/customers"
+                );
+                exit();
+            },
+            $icon_base_url . "clientes.svg",
+            3
+        );
 
-    // Clientes
-    add_menu_page(
-        __('Clientes', 'custom-editor-menu'), // Page title
-        __('Clientes', 'custom-editor-menu'), // Menu title
-        'read', // Capability
-        'clientes', // Slug
-        function() { wp_redirect('/backoffice/admin.php?page=wc-admin&path=/customers'); exit; }, // Redirect
-        $icon_base_url . 'clientes.svg', // Icon
-        3 // Position
-    );
-
-    // Productos
-    add_menu_page(
-        __('Productos', 'custom-editor-menu'), // Page title
-        __('Productos', 'custom-editor-menu'), // Menu title
-        'read', // Capability
-        'productos', // Slug
-        function() { wp_redirect('/backoffice/edit.php?post_type=product'); exit; }, // Redirect
-        $icon_base_url . 'productos.svg', // Icon
-        4 // Position
-    );
-
-        // Todos los productos
-        add_submenu_page(
-            'productos', // Parent slug
-            __('Todos los productos', 'custom-editor-menu'), // Page title
-            __('Todos los productos', 'custom-editor-menu'), // Menu title
-            'read', // Capability
-            'productos-todos-los-productos', // Slug
-            function() { wp_redirect('/backoffice/edit.php?post_type=product'); exit; } // Redirect
+        // --------------------------------------------------------------------------------------------------------
+        // Productos
+        // --------------------------------------------------------------------------------------------------------
+        add_menu_page(
+            __("Productos", "custom-editor-menu"),
+            __("Productos", "custom-editor-menu"),
+            "",
+            "productos",
+            function () {
+                wp_redirect("/backoffice/edit.php?post_type=product");
+                exit();
+            },
+            $icon_base_url . "productos.svg",
+            4
         );
 
         // Añadir nuevo producto
         add_submenu_page(
-            'productos', // Parent slug
-            __('Añadir nuevo producto', 'custom-editor-menu'), // Page title
-            __('Añadir nuevo producto', 'custom-editor-menu'), // Menu title
-            'read', // Capability
-            'productos-anadir-nuevo-producto', // Slug
-            function() { wp_redirect('/backoffice/post-new.php?post_type=product'); exit; } // Redirect
+            "productos",
+            __("Añadir nuevo producto", "custom-editor-menu"),
+            __("Añadir nuevo producto", "custom-editor-menu"),
+            "read",
+            "productos-anadir-nuevo-producto",
+            function () {
+                wp_redirect("/backoffice/post-new.php?post_type=product");
+                exit();
+            }
         );
 
         // Categorías
         add_submenu_page(
-            'productos', // Parent slug
-            __('Categorías', 'custom-editor-menu'), // Page title
-            __('Categorías', 'custom-editor-menu'), // Menu title
-            'read', // Capability
-            'productos-categorias', // Slug
-            function() { wp_redirect('/backoffice/edit-tags.php?taxonomy=product_cat&post_type=product'); exit; } // Redirect
+            "productos",
+            __("Categorías", "custom-editor-menu"),
+            __("Categorías", "custom-editor-menu"),
+            "read",
+            "productos-categorias",
+            function () {
+                wp_redirect(
+                    "/backoffice/edit-tags.php?taxonomy=product_cat&post_type=product"
+                );
+                exit();
+            }
         );
-        
+
         // Marcas
         add_submenu_page(
-            'productos', // Parent slug
-            __('Marcas', 'custom-editor-menu'), // Page title
-            __('Marcas', 'custom-editor-menu'), // Menu title
-            'read', // Capability
-            'productos-marcas', // Slug
-            function() { wp_redirect('/backoffice/edit-tags.php?taxonomy=berocket_brand&post_type=product'); exit; } // Redirect
+            "productos",
+            __("Marcas", "custom-editor-menu"),
+            __("Marcas", "custom-editor-menu"),
+            "read",
+            "productos-marcas",
+            function () {
+                wp_redirect(
+                    "/backoffice/edit-tags.php?taxonomy=berocket_brand&post_type=product"
+                );
+                exit();
+            }
         );
 
         // Etiquetas
         add_submenu_page(
-            'productos', // Parent slug
-            __('Etiquetas', 'custom-editor-menu'), // Page title
-            __('Etiquetas', 'custom-editor-menu'), // Menu title
-            'read', // Capability
-            'productos-etiquetas', // Slug
-            function() { wp_redirect('/backoffice/edit-tags.php?taxonomy=product_tag&post_type=product'); exit; } // Redirect
+            "productos",
+            __("Etiquetas", "custom-editor-menu"),
+            __("Etiquetas", "custom-editor-menu"),
+            "read",
+            "productos-etiquetas",
+            function () {
+                wp_redirect(
+                    "/backoffice/edit-tags.php?taxonomy=product_tag&post_type=product"
+                );
+                exit();
+            }
         );
 
         // Atributos
         add_submenu_page(
-            'productos', // Parent slug
-            __('Atributos', 'custom-editor-menu'), // Page title
-            __('Atributos', 'custom-editor-menu'), // Menu title
-            'read', // Capability
-            'productos-atributos', // Slug
-            function() { wp_redirect('/backoffice/edit.php?post_type=product&page=product_attributes'); exit; } // Redirect
+            "productos",
+            __("Atributos", "custom-editor-menu"),
+            __("Atributos", "custom-editor-menu"),
+            "read",
+            "productos-atributos",
+            function () {
+                wp_redirect(
+                    "/backoffice/edit.php?post_type=product&page=product_attributes"
+                );
+                exit();
+            }
         );
 
         // Valoraciones
         add_submenu_page(
-            'productos', // Parent slug
-            __('Valoraciones', 'custom-editor-menu'), // Page title
-            __('Valoraciones', 'custom-editor-menu'), // Menu title
-            'read', // Capability
-            'productos-valoraciones', // Slug
-            function() { wp_redirect('/backoffice/edit.php?post_type=product&page=product-reviews'); exit; } // Redirect
+            "productos",
+            __("Valoraciones", "custom-editor-menu"),
+            __("Valoraciones", "custom-editor-menu"),
+            "read",
+            "productos-valoraciones",
+            function () {
+                wp_redirect(
+                    "/backoffice/edit.php?post_type=product&page=product-reviews"
+                );
+                exit();
+            }
         );
-    
-    // Estadísticas
-    add_menu_page(
-        __('Estadísticas', 'custom-editor-menu'), // Page title
-        __('Estadísticas', 'custom-editor-menu'), // Menu title
-        'read', // Capability
-        'estadisticas', // Slug
-        function() { wp_redirect('/backoffice/admin.php?page=wc-admin&path=/analytics/overview'); exit; }, // Redirect
-        $icon_base_url . 'estadisticas.svg', // Icon
-        5 // Position
-    );
+
+        remove_submenu_page("productos", "productos");
+
+        // --------------------------------------------------------------------------------------------------------
+        // Estadísticas
+        // --------------------------------------------------------------------------------------------------------
+        add_menu_page(
+            __("Estadísticas", "custom-editor-menu"),
+            __("Estadísticas", "custom-editor-menu"),
+            "read",
+            "estadisticas",
+            function () {
+                wp_redirect(
+                    "/backoffice/admin.php?page=wc-admin&path=/analytics/overview"
+                );
+                exit();
+            },
+            $icon_base_url . "estadisticas.svg",
+            5
+        );
 
         // General
         add_submenu_page(
-            'estadisticas', // Parent slug
-            __('General', 'custom-editor-menu'), // Page title
-            __('General', 'custom-editor-menu'), // Menu title
-            'read', // Capability
-            'estadisticas-general', // Slug
-            function() { wp_redirect('/backoffice/admin.php?page=wc-admin&path=/analytics/overview'); exit; } // Redirect
+            "estadisticas",
+            __("General", "custom-editor-menu"),
+            __("General", "custom-editor-menu"), 
+            "read", 
+            "estadisticas-general", 
+            function () {
+                wp_redirect(
+                    "/backoffice/admin.php?page=wc-admin&path=/analytics/overview"
+                );
+                exit();
+            } 
         );
 
         // Productos
         add_submenu_page(
-            'estadisticas', // Parent slug
-            __('Productos', 'custom-editor-menu'), // Page title
-            __('Productos', 'custom-editor-menu'), // Menu title
-            'read', // Capability
-            'estadisticas-productos', // Slug
-            function() { wp_redirect('/backoffice/admin.php?page=wc-admin&path=/analytics/products'); exit; } // Redirect
+            "estadisticas", 
+            __("Productos", "custom-editor-menu"),
+            __("Productos", "custom-editor-menu"), 
+            "read", 
+            "estadisticas-productos", 
+            function () {
+                wp_redirect(
+                    "/backoffice/admin.php?page=wc-admin&path=/analytics/products"
+                );
+                exit();
+            } 
         );
 
         // Rentabilidad
         add_submenu_page(
-            'estadisticas', // Parent slug
-            __('Rentabilidad', 'custom-editor-menu'), // Page title
-            __('Rentabilidad', 'custom-editor-menu'), // Menu title
-            'read', // Capability
-            'estadisticas-rentabilidad', // Slug
-            function() { wp_redirect('/backoffice/admin.php?page=wc-admin&path=/analytics/revenue'); exit; } // Redirect
+            "estadisticas", 
+            __("Rentabilidad", "custom-editor-menu"),
+            __("Rentabilidad", "custom-editor-menu"), 
+            "read", 
+            "estadisticas-rentabilidad", 
+            function () {
+                wp_redirect(
+                    "/backoffice/admin.php?page=wc-admin&path=/analytics/revenue"
+                );
+                exit();
+            } 
         );
 
         // Pedidos
         add_submenu_page(
-            'estadisticas', // Parent slug
-            __('Pedidos', 'custom-editor-menu'), // Page title
-            __('Pedidos', 'custom-editor-menu'), // Menu title
-            'read', // Capability
-            'estadisticas-pedidos', // Slug
-            function() { wp_redirect('/backoffice/admin.php?page=wc-admin&path=/analytics/orders'); exit; } // Redirect
+            "estadisticas", 
+            __("Pedidos", "custom-editor-menu"),
+            __("Pedidos", "custom-editor-menu"), 
+            "read", 
+            "estadisticas-pedidos", 
+            function () {
+                wp_redirect(
+                    "/backoffice/admin.php?page=wc-admin&path=/analytics/orders"
+                );
+                exit();
+            } 
         );
 
         // Variaciones
         add_submenu_page(
-            'estadisticas', // Parent slug
-            __('Variaciones', 'custom-editor-menu'), // Page title
-            __('Variaciones', 'custom-editor-menu'), // Menu title
-            'read', // Capability
-            'estadisticas-variaciones', // Slug
-            function() { wp_redirect('/backoffice/admin.php?page=wc-admin&path=/analytics/variations'); exit; } // Redirect
+            "estadisticas", 
+            __("Variaciones", "custom-editor-menu"),
+            __("Variaciones", "custom-editor-menu"), 
+            "read", 
+            "estadisticas-variaciones", 
+            function () {
+                wp_redirect(
+                    "/backoffice/admin.php?page=wc-admin&path=/analytics/variations"
+                );
+                exit();
+            } 
         );
 
         // Categorías
         add_submenu_page(
-            'estadisticas', // Parent slug
-            __('Categorías', 'custom-editor-menu'), // Page title
-            __('Categorías', 'custom-editor-menu'), // Menu title
-            'read', // Capability
-            'estadisticas-categorias', // Slug
-            function() { wp_redirect('/backoffice/admin.php?page=wc-admin&path=/analytics/categories'); exit; } // Redirect
+            "estadisticas", 
+            __("Categorías", "custom-editor-menu"),
+            __("Categorías", "custom-editor-menu"), 
+            "read", 
+            "estadisticas-categorias", 
+            function () {
+                wp_redirect(
+                    "/backoffice/admin.php?page=wc-admin&path=/analytics/categories"
+                );
+                exit();
+            } 
         );
 
         // Cupones
         add_submenu_page(
-            'estadisticas', // Parent slug
-            __('Cupones', 'custom-editor-menu'), // Page title
-            __('Cupones', 'custom-editor-menu'), // Menu title
-            'read', // Capability
-            'estadisticas-cupones', // Slug
-            function() { wp_redirect('/backoffice/admin.php?page=wc-admin&path=/analytics/coupons'); exit; } // Redirect
+            "estadisticas", 
+            __("Cupones", "custom-editor-menu"),
+            __("Cupones", "custom-editor-menu"), 
+            "read", 
+            "estadisticas-cupones", 
+            function () {
+                wp_redirect(
+                    "/backoffice/admin.php?page=wc-admin&path=/analytics/coupons"
+                );
+                exit();
+            } 
         );
 
         // Impuestos
         add_submenu_page(
-            'estadisticas', // Parent slug
-            __('Impuestos', 'custom-editor-menu'), // Page title
-            __('Impuestos', 'custom-editor-menu'), // Menu title
-            'read', // Capability
-            'estadisticas-impuestos', // Slug
-            function() { wp_redirect('/backoffice/admin.php?page=wc-admin&path=/analytics/taxes'); exit; } // Redirect
+            "estadisticas", 
+            __("Impuestos", "custom-editor-menu"),
+            __("Impuestos", "custom-editor-menu"), 
+            "read", 
+            "estadisticas-impuestos", 
+            function () {
+                wp_redirect(
+                    "/backoffice/admin.php?page=wc-admin&path=/analytics/taxes"
+                );
+                exit();
+            } 
         );
 
         // Descargas
         add_submenu_page(
-            'estadisticas', // Parent slug
-            __('Descargas', 'custom-editor-menu'), // Page title
-            __('Descargas', 'custom-editor-menu'), // Menu title
-            'read', // Capability
-            'estadisticas-descargas', // Slug
-            function() { wp_redirect('/backoffice/admin.php?page=wc-admin&path=/analytics/downloads'); exit; } // Redirect
+            "estadisticas", 
+            __("Descargas", "custom-editor-menu"),
+            __("Descargas", "custom-editor-menu"), 
+            "read", 
+            "estadisticas-descargas", 
+            function () {
+                wp_redirect(
+                    "/backoffice/admin.php?page=wc-admin&path=/analytics/downloads"
+                );
+                exit();
+            } 
         );
 
         // Stock
         add_submenu_page(
-            'estadisticas', // Parent slug
-            __('Stock', 'custom-editor-menu'), // Page title
-            __('Stock', 'custom-editor-menu'), // Menu title
-            'read', // Capability
-            'estadisticas-stock', // Slug
-            function() { wp_redirect('/backoffice/admin.php?page=wc-admin&path=/analytics/stock'); exit; } // Redirect
+            "estadisticas", 
+            __("Stock", "custom-editor-menu"),
+            __("Stock", "custom-editor-menu"), 
+            "read", 
+            "estadisticas-stock", 
+            function () {
+                wp_redirect(
+                    "/backoffice/admin.php?page=wc-admin&path=/analytics/stock"
+                );
+                exit();
+            } 
         );
 
         // Ajustes
         add_submenu_page(
-            'estadisticas', // Parent slug
-            __('Ajustes', 'custom-editor-menu'), // Page title
-            __('Ajustes', 'custom-editor-menu'), // Menu title
-            'read', // Capability
-            'estadisticas-ajustes', // Slug
-            function() { wp_redirect('/backoffice/admin.php?page=wc-admin&path=/analytics/settings'); exit; } // Redirect
+            "estadisticas", 
+            __("Ajustes", "custom-editor-menu"),
+            __("Ajustes", "custom-editor-menu"), 
+            "read", 
+            "estadisticas-ajustes", 
+            function () {
+                wp_redirect(
+                    "/backoffice/admin.php?page=wc-admin&path=/analytics/settings"
+                );
+                exit();
+            } 
         );
+        remove_submenu_page("estadisticas", "estadisticas");
 
-    // Descuentos
-    add_menu_page(
-        __('Descuentos', 'custom-editor-menu'), // Page title
-        __('Descuentos', 'custom-editor-menu'), // Menu title
-        'read', // Capability
-        'descuentos', // Slug
-        function() { wp_redirect('/backoffice/edit.php?post_type=shop_coupon'); exit; }, // Redirect
-        $icon_base_url . 'descuentos.svg', // Icon
-        6 // Position
-    );
+        // --------------------------------------------------------------------------------------------------------
+        // Descuentos
+        // --------------------------------------------------------------------------------------------------------
+        add_menu_page(
+            __("Descuentos", "custom-editor-menu"),
+            __("Descuentos", "custom-editor-menu"), 
+            "read", 
+            "descuentos", 
+            function () {
+                wp_redirect("/backoffice/edit.php?post_type=shop_coupon");
+                exit();
+            }, 
+            $icon_base_url . "descuentos.svg", 
+            6 
+        );
 
         // Cupones
         add_submenu_page(
-            'descuentos', // Parent slug
-            __('Cupones', 'custom-editor-menu'), // Page title
-            __('Cupones', 'custom-editor-menu'), // Menu title
-            'read', // Capability
-            'descuentos-cupones', // Slug
-            function() { wp_redirect('/backoffice/edit.php?post_type=shop_coupon'); exit; } // Redirect
+            "descuentos", 
+            __("Cupones", "custom-editor-menu"),
+            __("Cupones", "custom-editor-menu"), 
+            "read", 
+            "descuentos-cupones", 
+            function () {
+                wp_redirect("/backoffice/edit.php?post_type=shop_coupon");
+                exit();
+            } 
         );
+        remove_submenu_page("descuentos", "descuentos");
 
-    // Google
-    add_menu_page(
-        __('Google', 'custom-editor-menu'), // Page title
-        __('Google', 'custom-editor-menu'), // Menu title
-        'read', // Capability
-        'google', // Slug
-        function() { wp_redirect('/backoffice/admin.php?page=wc-admin&path=/google/start'); exit; }, // Redirect
-        $icon_base_url . 'google.svg', // Icon
-        7 // Position
-    );
+        // --------------------------------------------------------------------------------------------------------
+        // Google
+        // --------------------------------------------------------------------------------------------------------
+        /*
+        add_menu_page(
+            __("Google", "custom-editor-menu"),
+            __("Google", "custom-editor-menu"), 
+            "read", 
+            "google", 
+            function () {
+                wp_redirect(
+                    "/backoffice/admin.php?page=wc-admin&path=/google/start"
+                );
+                exit();
+            }, 
+            $icon_base_url . "google.svg", 
+            7 
+        );
 
         // Integración
         add_submenu_page(
-            'google', // Parent slug
-            __('Integración', 'custom-editor-menu'), // Page title
-            __('Integración', 'custom-editor-menu'), // Menu title
-            'read', // Capability
-            'google-integracion', // Slug
-            function() { wp_redirect('/backoffice/admin.php?page=wc-admin&path=/google/start'); exit; } // Redirect
+            "google", 
+            __("Integración", "custom-editor-menu"),
+            __("Integración", "custom-editor-menu"), 
+            "read", 
+            "google-integracion", 
+            function () {
+                wp_redirect(
+                    "/backoffice/admin.php?page=wc-admin&path=/google/start"
+                );
+                exit();
+            } 
         );
 
         // Site Kit
         add_submenu_page(
-            'google', // Parent slug
-            __('Site Kit', 'custom-editor-menu'), // Page title
-            __('Site Kit', 'custom-editor-menu'), // Menu title
-            'read', // Capability
-            'google-site-kit', // Slug
-            function() { wp_redirect('/backoffice/admin.php?page=googlesitekit-splash'); exit; } // Redirect
+            "google", 
+            __("Site Kit", "custom-editor-menu"),
+            __("Site Kit", "custom-editor-menu"), 
+            "read", 
+            "google-site-kit", 
+            function () {
+                wp_redirect("/backoffice/admin.php?page=googlesitekit-splash");
+                exit();
+            } 
         );
-
-    // Meta
-    add_menu_page(
-        __('Meta', 'custom-editor-menu'), // Page title
-        __('Meta', 'custom-editor-menu'), // Menu title
-        'read', // Capability
-        'meta', // Slug
-        function() { wp_redirect('/backoffice/admin.php?page=wc-facebook'); exit; }, // Redirect
-        $icon_base_url . 'meta.svg', // Icon
-        8 // Position
-    );
+        remove_submenu_page("google", "google");
+*/
+        //	--------------------------------------------------------------------------------------------------------
+        // Meta
+        // --------------------------------------------------------------------------------------------------------
+        /*
+        add_menu_page(
+            __("Meta", "custom-editor-menu"),
+            __("Meta", "custom-editor-menu"), 
+            "read", 
+            "meta", 
+            function () {
+                wp_redirect("/backoffice/admin.php?page=wc-facebook");
+                exit();
+            }, 
+            $icon_base_url . "meta.svg", 
+            8 
+        );
 
         // Facebook
         add_submenu_page(
-            'meta', // Parent slug
-            __('Facebook', 'custom-editor-menu'), // Page title
-            __('Facebook', 'custom-editor-menu'), // Menu title
-            'read', // Capability
-            'meta-facebook', // Slug
-            function() { wp_redirect('/backoffice/admin.php?page=wc-facebook'); exit; } // Redirect
+            "meta", 
+            __("Facebook", "custom-editor-menu"),
+            __("Facebook", "custom-editor-menu"), 
+            "read", 
+            "meta-facebook", 
+            function () {
+                wp_redirect("/backoffice/admin.php?page=wc-facebook");
+                exit();
+            } 
         );
 
         // Pixel
         add_submenu_page(
-            'meta', // Parent slug
-            __('Pixel', 'custom-editor-menu'), // Page title
-            __('Pixel', 'custom-editor-menu'), // Menu title
-            'read', // Capability
-            'meta-pixel', // Slug
-            function() { wp_redirect('/backoffice/options-general.php?page=facebook_pixel_options'); exit; } // Redirect
+            "meta", 
+            __("Pixel", "custom-editor-menu"),
+            __("Pixel", "custom-editor-menu"), 
+            "read", 
+            "meta-pixel", 
+            function () {
+                wp_redirect(
+                    "/backoffice/options-general.php?page=facebook_pixel_options"
+                );
+                exit();
+            } 
         );
-
-    // TikTok
-    add_menu_page(
-        __('TikTok', 'custom-editor-menu'), // Page title
-        __('TikTok', 'custom-editor-menu'), // Menu title
-        'read', // Capability
-        'tiktok', // Slug
-        function() { wp_redirect('/backoffice/admin.php?page=tiktok'); exit; }, // Redirect
-        $icon_base_url . 'tiktok.svg', // Icon
-        9 // Position
-    );
-
-    // WhatsApp
-    add_menu_page(
-        __('WhatsApp', 'custom-editor-menu'), // Page title
-        __('WhatsApp', 'custom-editor-menu'), // Menu title
-        'read', // Capability
-        'whatsapp', // Slug
-        function() { wp_redirect('/backoffice/admin.php?page=click-to-chat'); exit; }, // Redirect
-        $icon_base_url . 'whatsapp.svg', // Icon
-        10 // Position
-    );
-
+*/
+        //--------------------------------------------------------------------------------------------------------
+        // TikTok
+        // --------------------------------------------------------------------------------------------------------
+        /*
+        add_menu_page(
+            __("TikTok", "custom-editor-menu"),
+            __("TikTok", "custom-editor-menu"), 
+            "read", 
+            "tiktok", 
+            function () {
+                wp_redirect("/backoffice/admin.php?page=tiktok");
+                exit();
+            }, 
+            $icon_base_url . "tiktok.svg", 
+            9 
+        );
+        */
+        // --------------------------------------------------------------------------------------------------------
+        // WhatsApp
+        // --------------------------------------------------------------------------------------------------------
+        /*
+        add_menu_page(
+            __("WhatsApp", "custom-editor-menu"),
+            __("WhatsApp", "custom-editor-menu"), 
+            "read", 
+            "whatsapp", 
+            function () {
+                wp_redirect("/backoffice/admin.php?page=click-to-chat");
+                exit();
+            }, 
+            $icon_base_url . "whatsapp.svg", 
+            10 
+        );
+        */
+        // --------------------------------------------------------------------------------------------------------
         // Ajustes
+        // --------------------------------------------------------------------------------------------------------
+        /*
         add_submenu_page(
-            'whatsapp', // Parent slug
-            __('Ajustes', 'custom-editor-menu'), // Page title
-            __('Ajustes', 'custom-editor-menu'), // Menu title
-            'read', // Capability
-            'whatsapp-ajustes', // Slug
-            function() { wp_redirect('/backoffice/admin.php?page=click-to-chat'); exit; } // Redirect
+            "whatsapp", 
+            __("Ajustes", "custom-editor-menu"),
+            __("Ajustes", "custom-editor-menu"), 
+            "read", 
+            "whatsapp-ajustes", 
+            function () {
+                wp_redirect("/backoffice/admin.php?page=click-to-chat");
+                exit();
+            } 
         );
 
         // Saludos
         add_submenu_page(
-            'whatsapp', // Parent slug
-            __('Saludos', 'custom-editor-menu'), // Page title
-            __('Saludos', 'custom-editor-menu'), // Menu title
-            'read', // Capability
-            'whatsapp-saludos', // Slug
-            function() { wp_redirect('/backoffice/admin.php?page=click-to-chat-greetings'); exit; } // Redirect
+            "whatsapp", 
+            __("Saludos", "custom-editor-menu"),
+            __("Saludos", "custom-editor-menu"), 
+            "read", 
+            "whatsapp-saludos", 
+            function () {
+                wp_redirect(
+                    "/backoffice/admin.php?page=click-to-chat-greetings"
+                );
+                exit();
+            } 
         );
-    
-    // Mailchimp
-    add_menu_page(
-        __('Mailchimp', 'custom-editor-menu'), // Page title
-        __('Mailchimp', 'custom-editor-menu'), // Menu title
-        'read', // Capability
-        'mailchimp', // Slug
-        function() { wp_redirect('/backoffice/admin.php?page=mailchimp-woocommerce'); exit; }, // Redirect
-        $icon_base_url . 'mailchimp.svg', // Icon
-        11 // Position
-    );
+        */
+        //--------------------------------------------------------------------------------------------------------
+        // Mailchimp
+        // --------------------------------------------------------------------------------------------------------
+        add_menu_page(
+            __("Mailchimp", "custom-editor-menu"),
+            __("Mailchimp", "custom-editor-menu"), 
+            "read", 
+            "mailchimp", 
+            function () {
+                wp_redirect("/backoffice/admin.php?page=mailchimp-woocommerce");
+                exit();
+            }, 
+            $icon_base_url . "mailchimp.svg", 
+            11 
+        );
 
-    // Mercado Pago
-    add_menu_page(
-        __('Mercado Pago', 'custom-editor-menu'), // Page title
-        __('Mercado Pago', 'custom-editor-menu'), // Menu title
-        'read', // Capability
-        'mercado-pago', // Slug
-        function() { wp_redirect('/backoffice/admin.php?page=mercadopago-settings'); exit; }, // Redirect
-        $icon_base_url . 'mercado-pago.svg', // Icon
-        12 // Position
-    );
+        // --------------------------------------------------------------------------------------------------------
+        // Mercado Pago
+        // --------------------------------------------------------------------------------------------------------
+        add_menu_page(
+            __("Mercado Pago", "custom-editor-menu"),
+            __("Mercado Pago", "custom-editor-menu"), 
+            "read", 
+            "mercado-pago", 
+            function () {
+                wp_redirect("/backoffice/admin.php?page=mercadopago-settings");
+                exit();
+            }, 
+            $icon_base_url . "mercado-pago.svg", 
+            12 
+        );
 
-    // Payway
-    add_menu_page(
-        __('Payway', 'custom-editor-menu'), // Page title
-        __('Payway', 'custom-editor-menu'), // Menu title
-        'read', // Capability
-        'payway', // Slug
-        function() { wp_redirect('/backoffice/admin.php?page=payway_admin_promotions'); exit; }, // Redirect
-        $icon_base_url . 'payway.svg', // Icon
-        13 // Position
-    );
+        // --------------------------------------------------------------------------------------------------------
+        // Payway
+        // --------------------------------------------------------------------------------------------------------
+        add_menu_page(
+            __("Payway", "custom-editor-menu"),
+            __("Payway", "custom-editor-menu"), 
+            "read", 
+            "payway", 
+            function () {
+                wp_redirect(
+                    "/backoffice/admin.php?page=payway_admin_promotions"
+                );
+                exit();
+            }, 
+            $icon_base_url . "payway.svg", 
+            13 
+        );
 
         // Promociones
         add_submenu_page(
-            'payway', // Parent slug
-            __('Promociones', 'custom-editor-menu'), // Page title
-            __('Promociones', 'custom-editor-menu'), // Menu title
-            'read', // Capability
-            'payway-promociones', // Slug
-            function() { wp_redirect('/backoffice/admin.php?page=payway_admin_promotions'); exit; } // Redirect
+            "payway", 
+            __("Promociones", "custom-editor-menu"),
+            __("Promociones", "custom-editor-menu"), 
+            "read", 
+            "payway-promociones", 
+            function () {
+                wp_redirect(
+                    "/backoffice/admin.php?page=payway_admin_promotions"
+                );
+                exit();
+            } 
         );
 
         // Bancos
         add_submenu_page(
-            'payway', // Parent slug
-            __('Bancos', 'custom-editor-menu'), // Page title
-            __('Bancos', 'custom-editor-menu'), // Menu title
-            'read', // Capability
-            'payway-bancos', // Slug
-            function() { wp_redirect('/backoffice/admin.php?page=payway_admin_banks'); exit; } // Redirect
+            "payway", 
+            __("Bancos", "custom-editor-menu"),
+            __("Bancos", "custom-editor-menu"), 
+            "read", 
+            "payway-bancos", 
+            function () {
+                wp_redirect("/backoffice/admin.php?page=payway_admin_banks");
+                exit();
+            } 
         );
 
         // Tarjetas
         add_submenu_page(
-            'payway', // Parent slug
-            __('Tarjetas', 'custom-editor-menu'), // Page title
-            __('Tarjetas', 'custom-editor-menu'), // Menu title
-            'read', // Capability
-            'payway-tarjetas', // Slug
-            function() { wp_redirect('/backoffice/admin.php?page=payway_admin_cards'); exit; } // Redirect
+            "payway", 
+            __("Tarjetas", "custom-editor-menu"),
+            __("Tarjetas", "custom-editor-menu"), 
+            "read", 
+            "payway-tarjetas", 
+            function () {
+                wp_redirect("/backoffice/admin.php?page=payway_admin_cards");
+                exit();
+            } 
         );
 
         // Ajustes
+        /*
         add_submenu_page(
-            'payway', // Parent slug
-            __('Ajustes', 'custom-editor-menu'), // Page title
-            __('Ajustes', 'custom-editor-menu'), // Menu title
-            'read', // Capability
-            'payway-ajustes', // Slug
-            function() { wp_redirect('/backoffice/admin.php?page=wc-settings&tab=checkout&section=payway_gateway'); exit; } // Redirect
+            "payway", 
+            __("Ajustes", "custom-editor-menu"),
+            __("Ajustes", "custom-editor-menu"), 
+            "read", 
+            "payway-ajustes", 
+            function () {
+                wp_redirect(
+                    "/backoffice/admin.php?page=wc-settings&tab=checkout&section=payway_gateway"
+                );
+                exit();
+            } 
+        );
+        */
+
+        remove_submenu_page("payway","payway");
+        // --------------------------------------------------------------------------------------------------------
+        // Transferencia Bancaria
+        // --------------------------------------------------------------------------------------------------------
+        /*
+        add_menu_page(
+            __("Transferencia Bancaria", "custom-editor-menu"),
+            __("Transferencia Bancaria", "custom-editor-menu"), 
+            "read", 
+            "transferencia-bancaria", 
+            function () {
+                wp_redirect(
+                    "/backoffice/admin.php?page=wc-settings&tab=checkout&section=bacs"
+                );
+                exit();
+            }, 
+            $icon_base_url . "transferencia-bancaria.svg", 
+            14 
+        );
+        */
+        // --------------------------------------------------------------------------------------------------------
+        // Correo Argentino
+        // --------------------------------------------------------------------------------------------------------
+        add_menu_page(
+            __("Correo Argentino", "custom-editor-menu"),
+            __("Correo Argentino", "custom-editor-menu"), 
+            "read", 
+            "correo-argentino", 
+            function () {
+                wp_redirect(
+                    "/backoffice/admin.php?page=correoargentino-orders"
+                );
+                exit();
+            }, 
+            $icon_base_url . "correo-argentino.svg", 
+            15 
         );
 
-    // Transferencia Bancaria
-    add_menu_page(
-        __('Transferencia Bancaria', 'custom-editor-menu'), // Page title
-        __('Transferencia Bancaria', 'custom-editor-menu'), // Menu title
-        'read', // Capability
-        'transferencia-bancaria', // Slug
-        function() { wp_redirect('/backoffice/admin.php?page=wc-settings&tab=checkout&section=bacs'); exit; }, // Redirect
-        $icon_base_url . 'transferencia-bancaria.svg', // Icon
-        14 // Position
-    );
-
-    // Correo Argentino
-    add_menu_page(
-        __('Correo Argentino', 'custom-editor-menu'), // Page title
-        __('Correo Argentino', 'custom-editor-menu'), // Menu title
-        'read', // Capability
-        'correo-argentino', // Slug
-        function() { wp_redirect('/backoffice/admin.php?page=correoargentino-orders'); exit; }, // Redirect
-        $icon_base_url . 'correo-argentino.svg', // Icon
-        15 // Position
-    );
-
         // Órdenes
+        /*
         add_submenu_page(
-            'correo-argentino', // Parent slug
-            __('Órdenes', 'custom-editor-menu'), // Page title
-            __('Órdenes', 'custom-editor-menu'), // Menu title
-            'read', // Capability
-            'correo-argentino-ordenes', // Slug
-            function() { wp_redirect('/backoffice/admin.php?page=correoargentino-orders'); exit; } // Redirect
+            "correo-argentino", 
+            __("Órdenes", "custom-editor-menu"),
+            __("Órdenes", "custom-editor-menu"), 
+            "read", 
+            "correo-argentino-ordenes", 
+            function () {
+                wp_redirect(
+                    "/backoffice/admin.php?page=correoargentino-orders"
+                );
+                exit();
+            } 
         );
 
         // Conexión API
         add_submenu_page(
-            'correo-argentino', // Parent slug
-            __('Conexión API', 'custom-editor-menu'), // Page title
-            __('Conexión API', 'custom-editor-menu'), // Menu title
-            'read', // Capability
-            'correo-argentino-conexion-api', // Slug
-            function() { wp_redirect('/backoffice/admin.php?page=wc-settings&tab=shipping&section=correoargentino_shipping_method&form=service-selector'); exit; } // Redirect
+            "correo-argentino", 
+            __("Conexión API", "custom-editor-menu"),
+            __("Conexión API", "custom-editor-menu"), 
+            "read", 
+            "correo-argentino-conexion-api", 
+            function () {
+                wp_redirect(
+                    "/backoffice/admin.php?page=wc-settings&tab=shipping&section=correoargentino_shipping_method&form=service-selector"
+                );
+                exit();
+            } 
         );
-
-    // Páginas
-    add_menu_page(
-        __('Páginas', 'custom-editor-menu'), // Page title
-        __('Páginas', 'custom-editor-menu'), // Menu title
-        'read', // Capability
-        'paginas', // Slug
-        function() { wp_redirect('/backoffice/edit.php?post_type=page'); exit; }, // Redirect
-        $icon_base_url . 'paginas.svg', // Icon
-        16 // Position
-    );
-
-        // Todas las páginas
-        add_submenu_page(
-            'paginas', // Parent slug
-            __('Todas las páginas', 'custom-editor-menu'), // Page title
-            __('Todas las páginas', 'custom-editor-menu'), // Menu title
-            'read', // Capability
-            'paginas-todas-las-paginas', // Slug
-            function() { wp_redirect('/backoffice/edit.php?post_type=page'); exit; } // Redirect
+        */
+        // --------------------------------------------------------------------------------------------------------
+        // Páginas
+        // --------------------------------------------------------------------------------------------------------
+        add_menu_page(
+            __("Páginas", "custom-editor-menu"),
+            __("Páginas", "custom-editor-menu"), 
+            "read", 
+            "paginas", 
+            function () {
+                wp_redirect("/backoffice/edit.php?post_type=page");
+                exit();
+            }, 
+            $icon_base_url . "paginas.svg", 
+            16 
         );
 
         // Añadir nueva página
         add_submenu_page(
-            'paginas', // Parent slug
-            __('Añadir nueva página', 'custom-editor-menu'), // Page title
-            __('Añadir nueva página', 'custom-editor-menu'), // Menu title
-            'read', // Capability
-            'paginas-anadir-nueva-pagina', // Slug
-            function() { wp_redirect('/backoffice/post-new.php?post_type=page'); exit; } // Redirect
+            "paginas", 
+            __("Añadir nueva página", "custom-editor-menu"),
+            __("Añadir nueva página", "custom-editor-menu"), 
+            "read", 
+            "paginas-anadir-nueva-pagina", 
+            function () {
+                wp_redirect("/backoffice/post-new.php?post_type=page");
+                exit();
+            } 
         );
 
-    // Medios
-    add_menu_page(
-        __('Medios', 'custom-editor-menu'), // Page title
-        __('Medios', 'custom-editor-menu'), // Menu title
-        'read', // Capability
-        'medios', // Slug
-        function() { wp_redirect('/backoffice/upload.php'); exit; }, // Redirect
-        $icon_base_url . 'medios.svg', // Icon
-        17 // Position
-    );
+        remove_submenu_page("paginas","paginas");
+
+        // --------------------------------------------------------------------------------------------------------
+        // Medios
+        // --------------------------------------------------------------------------------------------------------
+        add_menu_page(
+            __("Archivos", "custom-editor-menu"),
+            __("Archivos", "custom-editor-menu"), 
+            "read", 
+            "archivos", 
+            function () {
+                wp_redirect("/backoffice/upload.php");
+                exit();
+            }, 
+            $icon_base_url . "medios.svg", 
+            17 
+        );
 
         // Biblioteca
+        /*
         add_submenu_page(
-            'medios', // Parent slug
-            __('Biblioteca', 'custom-editor-menu'), // Page title
-            __('Biblioteca', 'custom-editor-menu'), // Menu title
-            'read', // Capability
-            'medios-biblioteca', // Slug
-            function() { wp_redirect('/backoffice/upload.php'); exit; } // Redirect
+            "medios", 
+            __("Biblioteca", "custom-editor-menu"),
+            __("Biblioteca", "custom-editor-menu"), 
+            "read", 
+            "medios-biblioteca", 
+            function () {
+                wp_redirect("/backoffice/upload.php");
+                exit();
+            } 
         );
 
         // Añadir nuevo archivo de medios
         add_submenu_page(
-            'medios', // Parent slug
-            __('Añadir nuevo archivo de medios', 'custom-editor-menu'), // Page title
-            __('Añadir nuevo archivo de medios', 'custom-editor-menu'), // Menu title
-            'read', // Capability
-            'medios-anadir-nuevo-archivo-de-medios', // Slug
-            function() { wp_redirect('/backoffice/media-new.php'); exit; } // Redirect
+            "medios", 
+            __("Añadir nuevo archivo de medios", "custom-editor-menu"),
+            __("Añadir nuevo archivo de medios", "custom-editor-menu"), 
+            "read", 
+            "medios-anadir-nuevo-archivo-de-medios", 
+            function () {
+                wp_redirect("/backoffice/media-new.php");
+                exit();
+            } 
         );
-
-    // Apariencia
-    add_menu_page(
-        __('Apariencia', 'custom-editor-menu'), // Page title
-        __('Apariencia', 'custom-editor-menu'), // Menu title
-        'read', // Capability
-        'apariencia', // Slug
-        function() { wp_redirect('/backoffice/nav-menus.php'); exit; }, // Redirect
-        $icon_base_url . 'apariencia.svg', // Icon
-        18 // Position
-    );
+        */
+        remove_submenu_page("archivos","archivos");
+        // --------------------------------------------------------------------------------------------------------
+        // Apariencia
+        // --------------------------------------------------------------------------------------------------------
+        add_menu_page(
+            __("Apariencia", "custom-editor-menu"),
+            __("Apariencia", "custom-editor-menu"), 
+            "read", 
+            "apariencia", 
+            function () {
+                wp_redirect("/backoffice/nav-menus.php");
+                exit();
+            }, 
+            $icon_base_url . "apariencia.svg", 
+            18 
+        );
 
         // Menús
         add_submenu_page(
-            'apariencia', // Parent slug
-            __('Menús', 'custom-editor-menu'), // Page title
-            __('Menús', 'custom-editor-menu'), // Menu title
-            'read', // Capability
-            'apariencia-menus', // Slug
-            function() { wp_redirect('/backoffice/nav-menus.php'); exit; } // Redirect
+            "apariencia", 
+            __("Menús", "custom-editor-menu"),
+            __("Menús", "custom-editor-menu"), 
+            "read", 
+            "apariencia-menus", 
+            function () {
+                wp_redirect("/backoffice/nav-menus.php");
+                exit();
+            } 
         );
 
         // Favicon
         add_submenu_page(
-            'apariencia', // Parent slug
-            __('Favicon', 'custom-editor-menu'), // Page title
-            __('Favicon', 'custom-editor-menu'), // Menu title
-            'read', // Capability
-            'apariencia-favicon', // Slug
-            function() { wp_redirect('/backoffice/themes.php?page=favicon-by-realfavicongenerator/admin/class-favicon-by-realfavicongenerator-admin.phpfavicon_appearance_menu'); exit; } // Redirect
+            "apariencia", 
+            __("Favicon", "custom-editor-menu"),
+            __("Favicon", "custom-editor-menu"), 
+            "read", 
+            "apariencia-favicon", 
+            function () {
+                wp_redirect(
+                    "/backoffice/themes.php?page=favicon-by-realfavicongenerator/admin/class-favicon-by-realfavicongenerator-admin.phpfavicon_appearance_menu"
+                );
+                exit();
+            } 
         );
 
-    // Usuarios
-    add_menu_page(
-        __('Usuarios', 'custom-editor-menu'), // Page title
-        __('Usuarios', 'custom-editor-menu'), // Menu title
-        'read', // Capability
-        'usuarios', // Slug
-        function() { wp_redirect('/backoffice/profile.php'); exit; }, // Redirect
-        $icon_base_url . 'usuarios.svg', // Icon
-        19 // Position
-    );
+        remove_submenu_page("apariencia","apariencia");
 
-    // Herramientas
-    add_menu_page(
-        __('Herramientas', 'custom-editor-menu'), // Page title
-        __('Herramientas', 'custom-editor-menu'), // Menu title
-        'read', // Capability
-        'herramientas', // Slug
-        function() { wp_redirect('/backoffice/import.php'); exit; }, // Redirect
-        $icon_base_url . 'herramientas.svg', // Icon
-        20 // Position
-    );
+        // --------------------------------------------------------------------------------------------------------
+        // Usuarios
+        // --------------------------------------------------------------------------------------------------------
+        add_menu_page(
+            __("Mi Perfil", "custom-editor-menu"),
+            __("Mi Perfil", "custom-editor-menu"), 
+            "read", 
+            "mi-perfil", 
+            function () {
+                wp_redirect("/backoffice/profile.php");
+                exit();
+            }, 
+            $icon_base_url . "usuarios.svg", 
+            19 
+        );
+
+        // Herramientas
+        /*
+        add_menu_page(
+            __("Herramientas 2", "custom-editor-menu"),
+            __("Herramientas", "custom-editor-menu"), 
+            "read", 
+            "herramientas", 
+            function () {
+                wp_redirect("/backoffice/import.php");
+                exit();
+            }, 
+            $icon_base_url . "herramientas.svg", 
+            20 
+        );
 
         // Importar
         add_submenu_page(
-            'herramientas', // Parent slug
-            __('Importar', 'custom-editor-menu'), // Page title
-            __('Importar', 'custom-editor-menu'), // Menu title
-            'read', // Capability
-            'herramientas-importar', // Slug
-            function() { wp_redirect('/backoffice/import.php'); exit; } // Redirect
+            "herramientas", 
+            __("Importar", "custom-editor-menu"),
+            __("Importar", "custom-editor-menu"), 
+            "read", 
+            "herramientas-importar", 
+            function () {
+                wp_redirect("/backoffice/import.php");
+                exit();
+            } 
         );
 
         // Exportar
         add_submenu_page(
-            'herramientas', // Parent slug
-            __('Exportar', 'custom-editor-menu'), // Page title
-            __('Exportar', 'custom-editor-menu'), // Menu title
-            'read', // Capability
-            'herramientas-exportar', // Slug
-            function() { wp_redirect('/backoffice/export.php'); exit; } // Redirect
+            "herramientas", 
+            __("Exportar", "custom-editor-menu"),
+            __("Exportar", "custom-editor-menu"), 
+            "read", 
+            "herramientas-exportar", 
+            function () {
+                wp_redirect("/backoffice/export.php");
+                exit();
+            } 
         );
+        */
+        }
+    return;
 }
